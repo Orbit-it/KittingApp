@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 from django import template
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
@@ -25,15 +26,18 @@ def index(request):
     poste = Poste.objects.all()
     listing = Listing.objects.all()
 
+    selection_id = State_selection.objects.all()
+
     # End =====================================================================
 
     
     context = {'segment': 'index',
-            "list_article": list_article,
+            "articles": list_article,
             "list_fournisseur": list_fournisseur,
             "list_projet": list_projet,
             "poste": poste,
             "listing": listing,
+            'selection_id': selection_id,
                }
     
 
@@ -78,8 +82,41 @@ def selected_poste(request):
         id = request.POST.get('id')
         try:
             poste = Poste.objects.get(id=id)
+            selection_id = State_selection.objects.update(selected_poste_id = id)
             # Effectuez des opérations avec l'objet `poste` selon vos besoins
             return JsonResponse({"status": "success", "intitule_du_poste": poste.intitule, "projet_encours": poste.projet_id.intitule})
         except Poste.DoesNotExist:
             return JsonResponse({"status": "error", "message": "Poste not found."})
     return JsonResponse({"status": "error", "message": "Invalid request method."})
+
+@login_required(login_url="/login/")
+def get_articles(request):
+        article_id = request.GET.get('ref_intern')
+        qts = request.GET.get('qts')
+        try:
+            
+            article = Article.objects.get(ref_intern=article_id)
+            recup_qte = Art_stock.objects.get(ref_intern = article.id)
+
+            if (float(recup_qte.qte) < float(qts)):
+                status = "Indisponible"
+            else: status = "dispo"
+
+            article_data = {
+                'fournisseur': article.fournisseur.nom,
+                'designation': article.designation,
+                'ref_intern': article.ref_intern,
+                'ref_fourn': article.ref_fourn,
+                'qte':recup_qte.qte,
+                'qte_s': qts,
+                'status':status
+            }
+
+            
+
+            Listing.objects.create(ref_intern = article.ref_intern, ref_fourn = article.ref_fourn, designation = article.designation, 
+                                   fournisseur = article.fournisseur.nom, qte_en_stk = recup_qte.qte, qte_a_sortir = qts, status = status,
+                                   bon_de_sortie_id = 1)
+            return JsonResponse({'article': article_data})
+        except Article.DoesNotExist: 
+            return JsonResponse({"status": "error", "message": "Article not found."})     

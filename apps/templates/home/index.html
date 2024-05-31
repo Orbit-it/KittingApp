@@ -13,6 +13,9 @@
       scroll-behavior: smooth;
       box-sizing: border-box;
   }
+  .validate-button {
+    background-color: chartreuse;
+  }
 </style>
 
 {% endblock stylesheets %}
@@ -94,73 +97,89 @@
             </div>
             <div class="card-body px-0 pb-2">
               <div class="table-responsive">
-                <table class="table align-items-center mb-0">
+                <table id="articles-table" class="table align-items-center mb-0">
                   <thead>
                     <tr>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Fournisseur</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Designation</th>
-                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Réf_interne</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Réf_Fournisseur</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Qté en Stock</th>
-                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Qté à Sortir</th>
+                      <th class="text-uppercase text-info text-xxs font-weight-bolder opacity-7">Fournisseur</th>
+                      <th class="text-uppercase text-info text-xxs font-weight-bolder opacity-7">Designation</th>
+                      <th class="text-uppercase text-info text-xxs font-weight-bolder opacity-7 ps-2">Réf_interne</th>
+                      <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Réf_Fournisseur</th>
+                      <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Qté en Stock</th>
+                      <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Qté à Sortir</th>
+                      <th class="text-center text-uppercase text-info text-xxs font-weight-bolder opacity-7">Status</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>
-                        <div class="d-flex px-2 py-1">
-                          <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">**fourn***</h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                      
-                        <div class="d-flex flex-column justify-content-center">
-                          <h6 class="mb-0 text-sm">**designation***</h6>
-                        </div>
-                        
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> **Ref_intern** </span>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> **Ref_fourn** </span>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> **Qté** </span>
-                      </td>
-                      <td class="align-middle text-center text-sm">
-                        <span class="text-xs font-weight-bold"> **5** </span>
-                      </td>
-                    </tr>
 
-                    <tr id="input-row">
+                    {% for listing in listing %}
+                     <!-- {% if listing.bon_de_sortie_id.poste_id == selection_id.selected_poste_id %}  -->
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div class="d-flex flex-column justify-content-center">
+                                <span class="mb-0 text-sm">{{listing.fournisseur}}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                          
+                            <div class="d-flex flex-column justify-content-center">
+                              <span class="mb-0 text-sm">{{listing.designation}}</span>
+                            </div>
+                            
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold">{{listing.ref_intern}}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold">{{listing.ref_fourn}}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold">{{listing.qte_en_stk}}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold">{{listing.qte_a_sortir}}</span>
+                          </td>
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold">{{listing.status}}</span>
+                          </td>
+                        </tr>
+
+                     <!-- {% endif %}  -->
+
+                    {% endfor %}
+
+                   
+                    
+                  </tbody>
+                  <tfoot>
+                    <tr id="input-row" style="display: none;">
                       <td colspan="5">
                       <div class="input-group" style=" margin: 5px;" >
                       
-                        <input type="text" class="form-control" placeholder="***Réf Fournisseur *** Désignation *** Réf_interne">
+                        <input id="article-input" type="text" list="liste_article" class="form-control" placeholder="***Réf Fournisseur *** Désignation *** Réf_interne">
+                        <datalist id="liste_article">
+                          {% for article in articles %}
+                          <option value="{{article.fournisseur.nom}} - {{article.designation}} - {{article.ref_intern}} - {{article.ref_fourn}}">
+                          {% endfor %}
+                        </datalist>
+
                       </div>  
                     </td>
                     <td>
                       <div class="input-group" style=" margin: 5px;" >
-                        <input type="text" class="form-control" placeholder="Qté à Sortir">
+                        <input id="qte_s" type="number" min="0" class="form-control" placeholder="Qté à Sortir">
                       </div>  
                     </td>
 
                     <td>
                       <div class="input-group" style=" justify-content: center; margin-top: 15px;" >
-                      <button type="button" class="btn bg-gradient-info"><i class="fas fa-plus"></i></button>
+                      <button id="article-input-button" type="button" class="btn bg-gradient-info"><i class="fas fa-plus"></i></button>
                     </div>  
                     </td>
                     
                      </tr>
-                   
-                   
-                    
-                  </tbody>
-                  
-                               
+                  </tfoot>            
                 
                 </table>
               </div>
@@ -189,6 +208,17 @@
       
       $('#toggle-input-article').click(function() {
         $('#input-row').toggle();
+        if ($('#input-row').is(':visible')) {
+                    $('#toggle-input-article').html(`
+                    <i style="background-color:green"; class="fas fa-check"></i> Valider
+                    `);
+                    
+                } else {
+                  $('#toggle-input-article').html(`
+                    <i class="fas fa-edit"></i> Editer
+                    `);
+                    location.reload();
+                }
       });      
 
 
@@ -242,6 +272,56 @@
             });
       };
     });
+
+    $(document).ready(function() {
+            function addArticleToTable(article) {
+                var tableBody = $('#articles-table tbody');
+                var row = tableBody.add('<tr></tr>');
+                row.append($('<td><span>').text(article.fournisseur)).addClass("align-middle text-center text-sm text-xs font-weight-bold");
+                row.append($('<td><span>').text(article.designation)).addClass("align-middle text-center text-sm text-xs font-weight-bold");
+                row.append($('<td><span>').text(article.ref_intern)).addClass("align-middle text-center text-sm text-xs font-weight-bold");
+                row.append($('<td><span>').text(article.ref_fourn)).addClass("align-middle text-center text-sm text-xs font-weight-bold");
+                row.append($('<td><span>').text(article.qte)).addClass("align-middle text-center text-sm text-xs font-weight-bold");
+                row.append($('<td><span>').text(article.qte_s)).addClass("align-middle text-center text-sm text-xs font-weight-bold");
+                row.append($('<td><span>').text(article.status)).addClass("align-middle text-center text-sm text-xs font-weight-bold");
+                tableBody.append($('<tr></tr>'));
+            
+            }
+
+            // Handle selection from datalist
+            $('#article-input-button').click('button', function() {
+                var inputValue = $('#article-input').val();
+                var parts  = inputValue.split(' - ');
+                var qte_a_sortir = $('#qte_s').val()  // recuperer la quantite à Sortir
+
+                if (qte_a_sortir == ""){
+                  alert("Veuillez Renseigner la qté à sortir")
+                }
+                
+                  else if (parts.length >= 4) {
+                      var ref_article = parts[2];
+                      console.log(ref_article);
+                      $.ajax({
+                          url: '/get_articles/',
+                          type: 'GET',
+                          data: { ref_intern: ref_article, qts:qte_a_sortir },
+                          dataType: 'json',
+                          success: function(response) {
+                              if (response.article) {
+                                  addArticleToTable(response.article);
+                                  // Vider le champ après le choix de l'article
+                                  $('#article-input').val("");  
+                                  $('#qte_s').val("")
+                                  
+                              }
+                          },
+                          error: function(xhr, status, error) {
+                              console.error('An error occurred:', error);
+                          }
+                      });
+                  }
+              });
+        });  
 
    
   </script>

@@ -27,6 +27,13 @@ class Poste(models.Model):
     kitting_id = models.ForeignKey(Kitting, on_delete=models.CASCADE)
     projet_id = models.ForeignKey(Projet, on_delete=models.CASCADE)
 
+
+
+class Bon_de_sortie(models.Model):
+    poste_id = models.ForeignKey(Poste, on_delete=models.CASCADE)
+    project_id = models.ForeignKey(Projet, on_delete=models.CASCADE)
+    status = models.CharField(default="En préparation", max_length=64) # status (En préparation, Imprimé, Envoyé)
+
 class Listing(models.Model): # Liste des Article selectionnés pour un Poste & Projet bien definit
     ref_intern = models.CharField(max_length=64)
     ref_fourn = models.CharField(default="", max_length=64)
@@ -34,16 +41,12 @@ class Listing(models.Model): # Liste des Article selectionnés pour un Poste & P
     fournisseur = models.CharField(default="", max_length=64)
     qte_en_stk = models.FloatField()
     qte_a_sortir = models.FloatField()
-    poste_id = models.ForeignKey(Poste, on_delete=models.CASCADE)
-    projet_id = models.ForeignKey(Projet, on_delete=models.CASCADE)
+    bon_de_sortie_id = models.CharField(default="", max_length=64)
     status = models.CharField(default="", max_length=64) # (dispo / indispo)
 
-class Bon_de_sortie(models.Model):
-    poste_id = models.ForeignKey(Poste, on_delete=models.CASCADE)
-    project_id = models.ForeignKey(Projet, on_delete=models.CASCADE)
-    status = models.CharField(default="En préparation", max_length=64) # status (En préparation, Imprimé, Envoyé)
-
-
+class State_selection(models.Model):
+    user = models.CharField(default="", max_length=64) 
+    selected_poste_id = models.IntegerField()
 
 # Liste des Tables pour la Base SAGE
     # Article
